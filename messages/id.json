@@ -1,0 +1,68 @@
+{
+  "nav": {
+    "about": "Tentang",
+    "skills": "Keahlian",
+    "projects": "Proyek",
+    "experience": "Pengalaman",
+    "contact": "Kontak"
+  },
+  "hero": {
+    "name": "Keanu Dustin Kemala",
+    "title": "Frontend Developer & UI/UX Designer",
+    "description": "Saya menciptakan pengalaman digital yang modern, responsif, dan user-centered menggunakan teknologi web terkini. Spesialisasi dalam Frontend Development, UI/UX Design, dan membangun aplikasi web yang scalable.",
+    "viewWork": "Lihat Karya Saya",
+    "learnMore": "Pelajari Lebih Lanjut",
+    "scrollExplore": "Scroll untuk explore"
+  },
+  "about": {
+    "title": "Tentang",
+    "subtitle": "Mahasiswa Teknologi Rekayasa Perangkat Lunak yang passionate tentang web modern",
+    "bio": "Saya Keanu Dustin Kemala, seorang Frontend Developer & UI/UX Designer yang saat ini berkuliah di Politeknik Meta Industri Cikarang (lulus 2026). Berpengalaman dalam pengembangan frontend, desain antarmuka responsif, dan aplikasi web modern dengan fokus pada pengalaman pengguna.",
+    "focus": "Saya percaya pada desain yang bersih, kode yang efisien, dan kolaborasi tim yang solid. Saya sering dipercaya sebagai manajer proyek atau ketua tim, dengan keahlian dalam manajemen tim dan koordinasi proyek.",
+    "availability": "Saat ini tersedia untuk proyek freelance dan peluang baru."
+  },
+  "skills": {
+    "title": "Keahlian & Expertise",
+    "frontend": "Frontend Development",
+    "frontendDesc": "React, Next.js, TypeScript, Tailwind CSS, Framer Motion",
+    "design": "UI/UX Design",
+    "designDesc": "Figma, Responsive Design, Design Systems, User Research",
+    "tools": "Tools & Teknologi",
+    "toolsDesc": "Git, VS Code, Vercel, Web Performance, Accessibility"
+  },
+  "projects": {
+    "title": "Proyek Unggulan",
+    "subtitle": "Memamerkan karya terbaik saya dalam frontend development dan design"
+  },
+  "experience": {
+    "title": "Pengalaman",
+    "education": "Pendidikan",
+    "certifications": "Sertifikasi"
+  },
+  "contact": {
+    "title": "Hubungi Saya",
+    "description": "Saya selalu tertarik untuk mendengar tentang proyek dan peluang baru.",
+    "email": "Email",
+    "phone": "Telepon",
+    "location": "Lokasi",
+    "form": {
+      "name": "Nama Anda",
+      "email": "Alamat Email",
+      "message": "Pesan",
+      "submit": "Kirim Pesan",
+      "sending": "Mengirim...",
+      "success": "Pesan terkirim dengan sukses!",
+      "error": "Terjadi kesalahan. Silakan coba lagi."
+    }
+  },
+  "footer": {
+    "location": "Indonesia",
+    "allRights": "Semua hak dilindungi.",
+    "follow": "Ikuti saya"
+  },
+  "theme": {
+    "light": "Terang",
+    "dark": "Gelap",
+    "system": "Sistem"
+  }
+}

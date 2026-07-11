@@ -1,0 +1,68 @@
+{
+  "nav": {
+    "about": "About",
+    "skills": "Skills",
+    "projects": "Projects",
+    "experience": "Experience",
+    "contact": "Contact"
+  },
+  "hero": {
+    "name": "Keanu Dustin Kemala",
+    "title": "Frontend Developer & UI/UX Designer",
+    "description": "I craft modern, responsive, and user-centered digital experiences using cutting-edge web technologies. Specializing in Frontend Development, UI/UX Design, and building scalable web applications.",
+    "viewWork": "View My Work",
+    "learnMore": "Learn More",
+    "scrollExplore": "Scroll to explore"
+  },
+  "about": {
+    "title": "About",
+    "subtitle": "Software Engineering Technology student passionate about modern web",
+    "bio": "I'm Keanu Dustin Kemala, a Frontend Developer & UI/UX Designer currently studying at Politeknik Meta Industri Cikarang (graduating 2026). Experienced in frontend development, responsive interface design, and modern web applications with a focus on user experience.",
+    "focus": "I believe in clean design, efficient code, and solid team collaboration. I often take on roles as a project manager or team leader, with expertise in team management and project coordination.",
+    "availability": "Currently available for freelance projects and new opportunities."
+  },
+  "skills": {
+    "title": "Skills & Expertise",
+    "frontend": "Frontend Development",
+    "frontendDesc": "React, Next.js, TypeScript, Tailwind CSS, Framer Motion",
+    "design": "UI/UX Design",
+    "designDesc": "Figma, Responsive Design, Design Systems, User Research",
+    "tools": "Tools & Technologies",
+    "toolsDesc": "Git, VS Code, Vercel, Web Performance, Accessibility"
+  },
+  "projects": {
+    "title": "Featured Projects",
+    "subtitle": "Showcasing my best work in frontend development and design"
+  },
+  "experience": {
+    "title": "Experience",
+    "education": "Education",
+    "certifications": "Certifications"
+  },
+  "contact": {
+    "title": "Get In Touch",
+    "description": "I&apos;m always interested in hearing about new projects and opportunities.",
+    "email": "Email",
+    "phone": "Phone",
+    "location": "Location",
+    "form": {
+      "name": "Your Name",
+      "email": "Email Address",
+      "message": "Message",
+      "submit": "Send Message",
+      "sending": "Sending...",
+      "success": "Message sent successfully!",
+      "error": "Something went wrong. Please try again."
+    }
+  },
+  "footer": {
+    "location": "Indonesia",
+    "allRights": "All rights reserved.",
+    "follow": "Follow me"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  }
+}
