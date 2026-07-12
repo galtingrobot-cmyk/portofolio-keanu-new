@@ -35,16 +35,25 @@ export function Projects() {
     {
       id: 6,
       title: 'Kopi Mood',
-      description: 'Aplikasi cerdas kedai kopi yang dilengkapi AI Barista untuk rekomendasi menu dan sistem pemesanan modern.',
+      description: 'Aplikasi kedai kopi dengan AI Barista dan sistem pemesanan modern.',
       category: 'web',
       tech: ['React', 'Next.js', 'TypeScript', 'Tailwind CSS', 'N8N', 'Supabase', 'Docker'],
       image: '/images/projects/cafe-mood-ai.png',
       link: 'https://cafe-mood-ai.vercel.app/',
     },
     {
+      id: 7,
+      title: 'Glockwerk CNC',
+      description: 'Company profile perusahaan CNC Machining dengan desain premium.',
+      category: 'web',
+      tech: ['Next.js', 'TypeScript', 'Tailwind CSS', 'Framer Motion', 'Vercel'],
+      image: '/images/projects/glockwerk.png',
+      link: 'https://glockwerk-cnc.vercel.app/',
+    },
+    {
       id: 1,
       title: 'NutriEdu',
-      description: "Aplikasi Deteksi Status Gizi Anak dengan Fitur Edukasi dan Panduan Gizi Seimbang.",
+      description: 'Deteksi status gizi anak dengan edukasi dan panduan gizi seimbang.',
       category: 'web',
       tech: ['React', 'TypeScript', 'Tailwind CSS', 'Leaflet.js', 'Vite'],
       image: '/images/projects/nutriedu.png',
@@ -53,16 +62,16 @@ export function Projects() {
     {
       id: 2,
       title: 'HIMTECH',
-      description: 'Website profile himpunan teknologi rekayasa perangkat lunak.',
+      description: 'Website profil himpunan teknologi rekayasa perangkat lunak.',
       category: 'web',
       tech: ['React', 'TypeScript', 'Next.js', 'Tailwind CSS', 'Shadcn UI'],
       image: '/images/projects/himtech.png',
-      link: 'https://himtech-2025.vercel.app/',
+      link: 'https://himtech-2026.vercel.app/',
     },
     {
       id: 3,
       title: 'Prototype Profile Cafe',
-      description: 'Design prototype profile cafe dengan desain yang modern dan responsif.',
+      description: 'Prototype UI/UX profil cafe yang modern dan responsif.',
       category: 'uiux',
       tech: ['Figma', 'Photoshop', 'Canva'],
       image: '/images/projects/cafe.png',
@@ -71,7 +80,7 @@ export function Projects() {
     {
       id: 4,
       title: 'Politeknik Meta Apps Mobile',
-      description: 'Design prototype aplikasi LMS yang memudahkan akses LMS dari perangkat seluler.',
+      description: 'Prototype aplikasi LMS Politeknik Meta untuk perangkat seluler.',
       category: 'uiux',
       tech: ['Figma', 'Photoshop', 'Canva'],
       image: '/images/projects/politeknik.png',
@@ -80,7 +89,7 @@ export function Projects() {
     {
       id: 5,
       title: 'Prototype Cinefusion',
-      description: 'Aplikasi streaming film dengan desain yang modern dan responsif.',
+      description: 'Prototype aplikasi streaming film dengan tampilan sinematik.',
       category: 'uiux',
       tech: ['Figma', 'Photoshop', 'Canva'],
       image: '/images/projects/cinefusion.png',
@@ -125,12 +134,13 @@ export function Projects() {
               <button
                 key={filter.key}
                 onClick={() => setActiveFilter(filter.key)}
-                className={`relative flex items-center gap-2 px-4 py-2.5 rounded-t-lg font-mono text-xs whitespace-nowrap transition-colors duration-200 ${
+                className={`relative flex items-center gap-2 px-4 py-2.5 rounded-t-lg font-mono text-xs whitespace-nowrap transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
                   isActive 
                     ? 'bg-black/5 dark:bg-white/5 text-foreground' 
                     : 'text-muted-foreground hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5'
                 }`}
               >
+                <span className="w-1.5 h-1.5 rounded-full shrink-0 bg-primary" />
                 {filter.key === 'all' ? 'all.sh' : filter.key === 'web' ? 'web.tsx' : 'uiux.fig'}
                 {isActive && (
                   <motion.span
@@ -146,15 +156,16 @@ export function Projects() {
 
         {/* Panel */}
         <div className="border border-black/10 dark:border-white/10 rounded-b-2xl rounded-tr-2xl bg-black/[0.02] dark:bg-white/[0.02] backdrop-blur-md p-6 md:p-8 min-h-[400px]">
-          <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-100px' }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-        >
-          <AnimatePresence mode="popLayout">
-            {filteredProjects.map((project) => (
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeFilter}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            >
+              {filteredProjects.map((project) => (
               <motion.div
                 key={project.id}
                 variants={itemVariants}
@@ -191,7 +202,7 @@ export function Projects() {
                   <h3 className="text-xl font-heading font-bold mb-2 group-hover:text-primary transition-colors">
                     {project.title}
                   </h3>
-                  <p className="text-foreground/70 mb-4 leading-relaxed text-sm line-clamp-2">
+                  <p className="text-foreground/70 mb-4 leading-relaxed text-sm">
                     {project.description}
                   </p>
 
@@ -229,9 +240,9 @@ export function Projects() {
                   </div>
                 </div>
               </motion.div>
-            ))}
+              ))}
+            </motion.div>
           </AnimatePresence>
-        </motion.div>
         </div>
       </div>
     </section>

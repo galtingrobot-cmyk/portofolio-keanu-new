@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { Volume2, VolumeX } from 'lucide-react'
 import { audioEngine } from '@/lib/audio-engine'
 
@@ -8,6 +8,8 @@ export function AudioToggle() {
   const [isPlaying, setIsPlaying] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [hasInteracted, setHasInteracted] = useState(false)
+  const [showTooltip, setShowTooltip] = useState(false)
+  const tooltipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     setMounted(true)
@@ -17,21 +19,25 @@ export function AudioToggle() {
       setIsPlaying(audioEngine.isPlaying)
     })
 
-    // Auto-start on first user interaction anywhere on the page
+    // Show tooltip after 2s to nudge the user
+    tooltipTimerRef.current = setTimeout(() => {
+      setShowTooltip(true)
+    }, 2000)
+
+    // Auto-start on first user interaction anywhere on the page (except the toggle itself)
     const handleFirstInteraction = () => {
-      if (!hasInteracted) {
-        setHasInteracted(true)
-        audioEngine.start().catch(() => {})
-      }
+      setHasInteracted(true)
+      setShowTooltip(false)
+      audioEngine.start().catch(() => {})
     }
 
-    // Listen to common interaction events
     document.addEventListener('click', handleFirstInteraction, { once: true })
     document.addEventListener('keydown', handleFirstInteraction, { once: true })
     document.addEventListener('touchstart', handleFirstInteraction, { once: true })
 
     return () => {
       unsub()
+      if (tooltipTimerRef.current) clearTimeout(tooltipTimerRef.current)
       document.removeEventListener('click', handleFirstInteraction)
       document.removeEventListener('keydown', handleFirstInteraction)
       document.removeEventListener('touchstart', handleFirstInteraction)
@@ -41,8 +47,17 @@ export function AudioToggle() {
 
   const handleToggle = useCallback(async (e: React.MouseEvent) => {
     e.stopPropagation()
+
+    // If this is the very first interaction, start audio
+    if (!hasInteracted) {
+      setHasInteracted(true)
+      setShowTooltip(false)
+      await audioEngine.start().catch(() => {})
+      return
+    }
+
     await audioEngine.toggle()
-  }, [])
+  }, [hasInteracted])
 
   if (!mounted) return null
 
@@ -58,7 +73,12 @@ export function AudioToggle() {
         {isPlaying ? (
           <Volume2 className="w-5 h-5 text-primary" />
         ) : (
-          <VolumeX className="w-5 h-5 text-muted-foreground" />
+          <VolumeX className={`w-5 h-5 ${!hasInteracted ? 'text-primary/60 animate-pulse' : 'text-muted-foreground'}`} />
+        )}
+
+        {/* Standby pulsing ring when waiting for first interaction */}
+        {!hasInteracted && (
+          <span className="absolute inset-0 rounded-full border-2 border-primary/30 animate-ping" style={{ animationDuration: '2.5s' }} />
         )}
 
         {/* Pulsing ring when playing */}
@@ -76,12 +96,13 @@ export function AudioToggle() {
         )}
       </div>
 
-      {/* Tooltip */}
-      {!hasInteracted && (
-        <div className="absolute bottom-full right-0 mb-3 px-3 py-1.5 text-xs font-medium text-foreground/80 bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/10 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-          🎵 Enable ambient audio
-        </div>
-      )}
+      {/* Tooltip — appears after 2s or on hover */}
+      <div
+        className={`absolute bottom-full right-0 mb-3 px-3 py-1.5 text-xs font-medium text-foreground/80 bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/10 rounded-lg whitespace-nowrap transition-all duration-500 pointer-events-none
+          ${showTooltip || !hasInteracted ? 'opacity-100 group-hover:opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+      >
+        {isPlaying ? '🎵 Playing ambient audio' : '🎵 Click to enable ambient audio'}
+      </div>
     </button>
   )
 }

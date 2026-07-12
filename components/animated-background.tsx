@@ -3,9 +3,36 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { audioEngine } from '@/lib/audio-engine'
 
-export function AnimatedBackground() {
+interface AnimatedBackgroundProps {
+  isSlowMo: boolean
+  isWaterEnabled: boolean
+}
+
+interface Ripple {
+  x: number
+  y: number
+  radius: number
+  maxRadius: number
+  amplitude: number
+  speed: number
+  age: number
+  maxAge: number
+}
+
+export function AnimatedBackground({ isSlowMo, isWaterEnabled }: AnimatedBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [mounted, setMounted] = useState(false)
+
+  const isSlowMoRef = useRef(isSlowMo)
+  const isWaterEnabledRef = useRef(isWaterEnabled)
+
+  useEffect(() => {
+    isSlowMoRef.current = isSlowMo
+  }, [isSlowMo])
+
+  useEffect(() => {
+    isWaterEnabledRef.current = isWaterEnabled
+  }, [isWaterEnabled])
 
   const animate = useCallback(() => {
     const canvas = canvasRef.current
@@ -17,8 +44,34 @@ export function AnimatedBackground() {
     let animationId: number
     let time = 0
 
+    // Speed scaling
+    let currentSpeedScale = 1.0
+
     // Smoothed audio values (lerp towards target)
     let sBass = 0, sMid = 0, sHigh = 0
+
+    // --- Pre-render Glow Canvases for Ring Particles ---
+    // This is a crucial performance optimization to avoid calling createRadialGradient 180 times per frame
+    const createGlowCanvas = (color: number[]) => {
+      const size = 64
+      const offscreen = document.createElement('canvas')
+      offscreen.width = size
+      offscreen.height = size
+      const oCtx = offscreen.getContext('2d')
+      if (oCtx) {
+        const grd = oCtx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2)
+        grd.addColorStop(0, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 1)`)
+        grd.addColorStop(0.3, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.4)`)
+        grd.addColorStop(0.6, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.1)`)
+        grd.addColorStop(1, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0)`)
+        oCtx.fillStyle = grd
+        oCtx.fillRect(0, 0, size, size)
+      }
+      return offscreen
+    }
+
+    const darkGlowCanvas = createGlowCanvas([140, 130, 255])
+    const lightGlowCanvas = createGlowCanvas([90, 70, 220])
 
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio, 2)
@@ -36,7 +89,8 @@ export function AnimatedBackground() {
     const h = () => window.innerHeight
 
     // --- Dot Grid Particles ---
-    const dotSpacing = 28
+    // Increased spacing to 36 for better performance and a cleaner modern look
+    const dotSpacing = 36
     const dotBaseRadius = 1.2
 
     // --- Orbital Ring Particles ---
@@ -63,15 +117,95 @@ export function AnimatedBackground() {
       life: Math.random(),
     }))
 
+    // --- Water Ripples State ---
+    const ripples: Ripple[] = []
+    let lastMouseX = 0
+    let lastMouseY = 0
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isWaterEnabledRef.current) return
+      const dx = e.clientX - lastMouseX
+      const dy = e.clientY - lastMouseY
+      const dist = Math.sqrt(dx * dx + dy * dy)
+
+      // Throttling mousemove ripples for high performance (min 50px movement)
+      if (dist > 50) {
+        ripples.push({
+          x: e.clientX,
+          y: e.clientY,
+          radius: 0,
+          maxRadius: 140 + Math.random() * 60,
+          amplitude: 16 + Math.random() * 10,
+          speed: 1.1 + Math.random() * 0.5,
+          age: 0,
+          maxAge: 80 + Math.random() * 25,
+        })
+        lastMouseX = e.clientX
+        lastMouseY = e.clientY
+      }
+    }
+
+    const handleMouseClick = (e: MouseEvent) => {
+      if (!isWaterEnabledRef.current) return
+      // Clear older ripples if we have too many active to prevent performance degradation
+      if (ripples.length > 8) {
+        ripples.splice(0, ripples.length - 8)
+      }
+      
+      // Click makes an epic, wider water ripple
+      ripples.push({
+        x: e.clientX,
+        y: e.clientY,
+        radius: 0,
+        maxRadius: 340 + Math.random() * 80,
+        amplitude: 40 + Math.random() * 15,
+        speed: 1.6 + Math.random() * 0.7,
+        age: 0,
+        maxAge: 130 + Math.random() * 30,
+      })
+    }
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!isWaterEnabledRef.current || e.touches.length === 0) return
+      const touch = e.touches[0]
+      const dx = touch.clientX - lastMouseX
+      const dy = touch.clientY - lastMouseY
+      const dist = Math.sqrt(dx * dx + dy * dy)
+
+      if (dist > 50) {
+        ripples.push({
+          x: touch.clientX,
+          y: touch.clientY,
+          radius: 0,
+          maxRadius: 120 + Math.random() * 50,
+          amplitude: 14 + Math.random() * 8,
+          speed: 0.9 + Math.random() * 0.5,
+          age: 0,
+          maxAge: 75 + Math.random() * 20,
+        })
+        lastMouseX = touch.clientX
+        lastMouseY = touch.clientY
+      }
+    }
+
+    window.addEventListener('mousemove', handleMouseMove, { passive: true })
+    window.addEventListener('click', handleMouseClick, { passive: true })
+    window.addEventListener('touchmove', handleTouchMove, { passive: true })
+
     // Detect theme
     const getIsDark = () => document.documentElement.classList.contains('dark')
 
     const draw = () => {
-      time += 0.008
       const isDark = getIsDark()
-
       const width = w()
       const height = h()
+
+      // Cinematic speed adjustment
+      const targetSpeedScale = isSlowMoRef.current ? 0.15 : 1.0
+      currentSpeedScale += (targetSpeedScale - currentSpeedScale) * 0.05
+
+      // Increment time scaled by current speed scale
+      time += 0.008 * currentSpeedScale
 
       // === Audio Reactivity ===
       const { bass, mid, high } = audioEngine.getAudioLevels()
@@ -90,7 +224,22 @@ export function AnimatedBackground() {
       const accentColor = isDark ? [80, 200, 255] : [60, 140, 220]     // cyan-blue
       const gridColor = isDark ? [140, 130, 255] : [90, 70, 220]
 
-      // === 1. Animated Dot Grid (reacts to bass) ===
+      // === Update Water Ripples ===
+      if (isWaterEnabledRef.current) {
+        for (let i = ripples.length - 1; i >= 0; i--) {
+          const rip = ripples[i]
+          rip.radius += rip.speed * currentSpeedScale
+          rip.age += 1 * currentSpeedScale
+          if (rip.age >= rip.maxAge || rip.radius >= rip.maxRadius) {
+            ripples.splice(i, 1)
+          }
+        }
+      } else {
+        // Reset ripples if water is disabled
+        if (ripples.length > 0) ripples.length = 0
+      }
+
+      // === 1. Animated Dot Grid (reacts to bass & water ripples) ===
       const gridOpacityBase = isDark ? 0.12 : 0.08
       const audioGridBoost = 1 + sBass * 2 // grid pulses with bass
       const offsetX = Math.sin(time * 0.3) * 8
@@ -101,8 +250,37 @@ export function AnimatedBackground() {
 
       for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
-          const x = col * dotSpacing + offsetX
-          const y = row * dotSpacing + offsetY
+          const baseX = col * dotSpacing + offsetX
+          const baseY = row * dotSpacing + offsetY
+
+          // Calculate displacement from ripples
+          let displaceX = 0
+          let displaceY = 0
+
+          if (isWaterEnabledRef.current && ripples.length > 0) {
+            for (let i = 0; i < ripples.length; i++) {
+              const rip = ripples[i]
+              const dx = baseX - rip.x
+              const dy = baseY - rip.y
+              const dist = Math.sqrt(dx * dx + dy * dy)
+
+              // Only displace if within the active wavefront area
+              const waveHalfWidth = 100
+              if (dist < rip.radius + waveHalfWidth && dist > rip.radius - waveHalfWidth && dist > 0) {
+                const ageRatio = rip.age / rip.maxAge
+                const distToWavefront = Math.abs(dist - rip.radius)
+                // Smooth envelope to prevent snapping at boundaries
+                const waveFade = Math.cos((distToWavefront / waveHalfWidth) * Math.PI * 0.5)
+                const waveIntensity = Math.sin((dist - rip.radius) * 0.06) * (1 - ageRatio) * rip.amplitude * waveFade
+                
+                displaceX += (dx / dist) * waveIntensity
+                displaceY += (dy / dist) * waveIntensity
+              }
+            }
+          }
+
+          const x = baseX + displaceX
+          const y = baseY + displaceY
 
           // Distance from center for wave effect
           const dx = x - width / 2
@@ -113,7 +291,7 @@ export function AnimatedBackground() {
           // Ripple wave — bass makes it faster
           const waveSpeed = 2 + sBass * 4
           const wave = Math.sin(dist * 0.008 - time * waveSpeed) * 0.5 + 0.5
-          const opacity = gridOpacityBase * audioGridBoost * (0.3 + wave * 0.7) * (1 - dist / maxDist * 0.5)
+          const opacity = gridOpacityBase * audioGridBoost * (0.3 + wave * 0.7) * (1 - (dist / maxDist) * 0.5)
           const radius = dotBaseRadius * (0.6 + wave * 0.4) * (1 + sBass * 0.5)
 
           ctx.beginPath()
@@ -145,7 +323,9 @@ export function AnimatedBackground() {
       ctx.fillStyle = glowGrad
       ctx.fillRect(0, 0, width, height)
 
-      // Draw ring particles
+      // Draw ring particles using high-performance pre-rendered glow canvases
+      const activeGlowCanvas = isDark ? darkGlowCanvas : lightGlowCanvas
+
       for (const p of ringParticles) {
         const angle = p.angle + time * p.speed
         const pulse = Math.sin(time * p.pulseSpeed + p.pulsePhase) * 0.5 + 0.5
@@ -165,14 +345,17 @@ export function AnimatedBackground() {
         const audioOpacityBoost = 1 + sMid * 2
         const opacity = Math.min(p.opacity * (0.3 + pulse * 0.7) * (isDark ? 0.7 : 0.4) * audioOpacityBoost, 1)
 
-        // Glow (bigger with audio)
+        // Glow (drawn efficiently using pre-rendered canvas to keep FPS stable)
         const glowSize = size * (3 + sMid * 2)
-        const grd = ctx.createRadialGradient(x, y, 0, x, y, glowSize)
-        grd.addColorStop(0, `rgba(${primaryColor[0]}, ${primaryColor[1]}, ${primaryColor[2]}, ${opacity * 0.8})`)
-        grd.addColorStop(0.4, `rgba(${primaryColor[0]}, ${primaryColor[1]}, ${primaryColor[2]}, ${opacity * 0.3})`)
-        grd.addColorStop(1, `rgba(${primaryColor[0]}, ${primaryColor[1]}, ${primaryColor[2]}, 0)`)
-        ctx.fillStyle = grd
-        ctx.fillRect(x - glowSize, y - glowSize, glowSize * 2, glowSize * 2)
+        ctx.globalAlpha = opacity * 0.8
+        ctx.drawImage(
+          activeGlowCanvas,
+          x - glowSize,
+          y - glowSize,
+          glowSize * 2,
+          glowSize * 2
+        )
+        ctx.globalAlpha = 1.0
 
         // Core dot
         ctx.beginPath()
@@ -182,7 +365,7 @@ export function AnimatedBackground() {
       }
 
       // === 3. Floating Particles (reacts to high frequencies) ===
-      const audioSpeedBoost = 1 + sHigh * 4
+      const audioSpeedBoost = (1 + sHigh * 4) * currentSpeedScale
       for (const p of floatingParticles) {
         p.x += p.vx * audioSpeedBoost
         p.y += p.vy * audioSpeedBoost
@@ -206,7 +389,42 @@ export function AnimatedBackground() {
         ctx.fill()
       }
 
-      // === 4. Scanline Effect (very subtle) ===
+      // === 4. Draw Visible Water Ripples ===
+      if (isWaterEnabledRef.current && ripples.length > 0) {
+        for (let i = 0; i < ripples.length; i++) {
+          const rip = ripples[i]
+          const ageRatio = rip.age / rip.maxAge
+          const fade = 1 - ageRatio
+
+          // Outer ring — main ripple
+          const outerAlpha = isDark ? fade * 0.45 : fade * 0.70
+          const outerColor = isDark
+            ? `rgba(80, 200, 255, ${outerAlpha})`
+            : `rgba(20, 60, 140, ${outerAlpha})`  // deep navy for contrast on light bg
+
+          ctx.beginPath()
+          ctx.arc(rip.x, rip.y, rip.radius, 0, Math.PI * 2)
+          ctx.strokeStyle = outerColor
+          ctx.lineWidth = isDark ? (2.5 * fade + 0.5) : (3.0 * fade + 0.8)
+          ctx.stroke()
+
+          // Inner glow ring (smaller radius, slightly ahead of wavefront)
+          if (rip.radius > 10) {
+            const innerAlpha = isDark ? fade * 0.20 : fade * 0.35
+            const innerColor = isDark
+              ? `rgba(140, 220, 255, ${innerAlpha})`
+              : `rgba(30, 80, 180, ${innerAlpha})`
+
+            ctx.beginPath()
+            ctx.arc(rip.x, rip.y, rip.radius * 0.82, 0, Math.PI * 2)
+            ctx.strokeStyle = innerColor
+            ctx.lineWidth = isDark ? (1.5 * fade) : (2.0 * fade)
+            ctx.stroke()
+          }
+        }
+      }
+
+      // === 5. Scanline Effect (very subtle) ===
       if (isDark) {
         const scanlineOpacity = 0.015
         for (let y = 0; y < height; y += 3) {
@@ -215,7 +433,7 @@ export function AnimatedBackground() {
         }
       }
 
-      // === 5. Vignette ===
+      // === 6. Vignette ===
       const vignetteGrad = ctx.createRadialGradient(
         centerX, centerY, Math.min(width, height) * 0.3,
         centerX, centerY, Math.max(width, height) * 0.8
@@ -234,6 +452,9 @@ export function AnimatedBackground() {
     return () => {
       cancelAnimationFrame(animationId)
       window.removeEventListener('resize', resize)
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('click', handleMouseClick)
+      window.removeEventListener('touchmove', handleTouchMove)
     }
   }, [])
 

@@ -76,6 +76,7 @@ export function Experience() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [expandedSkills, setExpandedSkills] = useState<Record<string, boolean>>({})
   const carouselRef = useRef<HTMLDivElement>(null)
+  const isDraggingRef = useRef(false)
 
   const scrollCarousel = (direction: 'left' | 'right') => {
     if (carouselRef.current) {
@@ -360,7 +361,7 @@ export function Experience() {
         {/* Panel */}
         <div className="border border-black/10 dark:border-white/10 rounded-b-2xl rounded-tr-2xl bg-black/[0.02] dark:bg-white/[0.02] backdrop-blur-md p-6 md:p-8 min-h-[320px]">
           <AnimatePresence mode="wait">
-            <motion.div key={activeTab} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+            <motion.div key={activeTab} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25, ease: 'easeOut' }}>
               {(activeTab === 'experience' || activeTab === 'education' || activeTab === 'activities') && (
                 <motion.div variants={containerVariants} initial="hidden" animate="visible">
                   {logEntries[activeTab].map((entry, index) => {
@@ -424,10 +425,36 @@ export function Experience() {
 
               {/* Certificates */}
               {activeTab === 'certificates' && (
-                <motion.div variants={containerVariants} initial="hidden" animate="visible" className="relative group/carousel -m-6 md:-m-8 p-6 md:p-8">
+                <motion.div variants={containerVariants} initial="hidden" animate="visible" className="relative -mx-6 md:-mx-8">
+                  {/* Left fade edge */}
+                  <div className="absolute left-0 top-0 bottom-0 w-12 md:w-20 bg-gradient-to-r from-background/80 to-transparent pointer-events-none z-10" />
+                  {/* Right fade edge */}
+                  <div className="absolute right-0 top-0 bottom-0 w-12 md:w-20 bg-gradient-to-l from-background/80 to-transparent pointer-events-none z-10" />
+
                   <div
                     ref={carouselRef}
-                    className="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+                    className="flex overflow-x-auto gap-4 pb-3 px-6 md:px-8 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] cursor-grab active:cursor-grabbing"
+                    onMouseDown={(e) => {
+                      const el = e.currentTarget
+                      const startX = e.pageX - el.offsetLeft
+                      const scrollLeft = el.scrollLeft
+                      isDraggingRef.current = false // Reset drag state on touch start
+
+                      const onMove = (ev: MouseEvent) => {
+                        const x = ev.pageX - el.offsetLeft
+                        // Set dragging flag if moved more than 5 pixels
+                        if (Math.abs(x - startX) > 5) {
+                          isDraggingRef.current = true
+                        }
+                        el.scrollLeft = scrollLeft - (x - startX)
+                      }
+                      const onUp = () => {
+                        document.removeEventListener('mousemove', onMove)
+                        document.removeEventListener('mouseup', onUp)
+                      }
+                      document.addEventListener('mousemove', onMove)
+                      document.addEventListener('mouseup', onUp)
+                    }}
                   >
                     {certificates.map((cert, index) => {
                       const mainImage = cert.images && cert.images.length > 0 ? cert.images[0] : null
@@ -435,81 +462,78 @@ export function Experience() {
                         <motion.div
                           key={index}
                           variants={itemVariants}
-                          className="flex-none w-[85vw] md:w-[45vw] lg:w-[360px] snap-center bg-white/[0.03] border border-black/10 dark:border-white/10 rounded-2xl overflow-hidden hover:border-black/20 dark:border-white/20 hover:-translate-y-1 transition-all duration-300 group cursor-pointer"
-                          onClick={() => {
+                          className="flex-none w-[260px] md:w-[300px] group cursor-pointer"
+                          onClick={(e) => {
+                            // If the user was dragging, don't open the image
+                            if (isDraggingRef.current) {
+                              e.preventDefault()
+                              return
+                            }
                             if (cert.images && cert.images.length > 0) {
                               setLightboxImages(cert.images)
                               setCurrentImageIndex(0)
                             }
                           }}
                         >
-                          {mainImage && (
-                            <div className="relative w-full h-48 overflow-hidden border-b border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5">
-                              <Image
-                                src={mainImage}
-                                alt={cert.name}
-                                fill
-                                className="object-cover group-hover:scale-105 transition-transform duration-700"
-                                sizes="(max-width: 768px) 100vw, 400px"
-                              />
-                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
-                                <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/60 backdrop-blur-sm p-2.5 rounded-full">
-                                  <ExternalLink className="w-4 h-4 text-white" />
+                          {/* Image area */}
+                          <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden mb-3 border border-black/8 dark:border-white/8 bg-black/5 dark:bg-white/5 shadow-md group-hover:shadow-xl group-hover:shadow-primary/10 transition-all duration-500 group-hover:-translate-y-1.5">
+                            {mainImage && (
+                              <>
+                                <Image
+                                  src={mainImage}
+                                  alt={cert.name}
+                                  fill
+                                  className="object-cover group-hover:scale-105 transition-transform duration-700"
+                                  sizes="(max-width: 768px) 260px, 300px"
+                                />
+                                {/* Hover overlay */}
+                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-colors duration-300 flex items-center justify-center">
+                                  <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 scale-75 group-hover:scale-100">
+                                    <div className="bg-white/20 backdrop-blur-md border border-white/30 rounded-full p-3">
+                                      <ExternalLink className="w-4 h-4 text-white" />
+                                    </div>
+                                  </div>
                                 </div>
-                              </div>
-                              <span
-                                className="absolute top-3 left-3 font-mono text-[10px] px-2 py-1 rounded border backdrop-blur-md text-primary border-primary/50 bg-black/50"
-                              >
-                                CERT · {String(index + 1).padStart(2, '0')}
-                              </span>
-                              {cert.images && cert.images.length > 1 && (
-                                <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-md text-white text-[10px] px-2 py-1 rounded font-mono border border-black/10 dark:border-white/10">
-                                  +{cert.images.length - 1}
-                                </div>
-                              )}
-                            </div>
-                          )}
-
-                          <div className="p-5">
-                            <h4 className="text-base font-semibold text-foreground/90 mb-1.5 line-clamp-2 leading-snug">{cert.name}</h4>
-                            <p className="text-xs mb-3 flex items-center gap-1.5 text-primary">
-                              <Award className="w-3 h-3" /> {cert.issuer}
-                            </p>
-                            <p className="text-foreground/60 text-sm mb-4 line-clamp-2">{cert.description}</p>
-                            <div className="flex flex-wrap gap-1.5">
-                              {cert.skills.slice(0, 3).map((skill, idx) => (
-                                <span key={idx} className="font-mono text-[10px] px-2 py-1 rounded bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-foreground/60">
-                                  {skill}
+                                {/* CERT badge */}
+                                <span className="absolute top-2.5 left-2.5 font-mono text-[9px] px-1.5 py-0.5 rounded border backdrop-blur-md text-primary border-primary/40 bg-background/75 dark:bg-black/65">
+                                  CERT · {String(index + 1).padStart(2, '0')}
                                 </span>
-                              ))}
-                              {cert.skills.length > 3 && (
-                                <span className="font-mono text-[10px] text-foreground/40 px-1.5 py-1">+{cert.skills.length - 3}</span>
-                              )}
-                            </div>
+                                {/* Multi-image indicator */}
+                                {cert.images && cert.images.length > 1 && (
+                                  <div className="absolute bottom-2.5 right-2.5 bg-black/55 backdrop-blur-md text-white text-[9px] px-1.5 py-0.5 rounded font-mono border border-white/10">
+                                    +{cert.images.length - 1}
+                                  </div>
+                                )}
+                              </>
+                            )}
+                          </div>
+
+                          {/* Text content — compact, below image */}
+                          <h4 className="text-sm font-semibold text-foreground/90 leading-snug mb-1 line-clamp-2 group-hover:text-primary transition-colors duration-200">{cert.name}</h4>
+                          <p className="text-[11px] flex items-center gap-1 text-primary/80 mb-1.5">
+                            <Award className="w-3 h-3 shrink-0" /> {cert.issuer}
+                          </p>
+                          <div className="flex flex-wrap gap-1">
+                            {cert.skills.slice(0, 2).map((skill, idx) => (
+                              <span key={idx} className="font-mono text-[9px] px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/5 border border-black/8 dark:border-white/8 text-foreground/50">
+                                {skill}
+                              </span>
+                            ))}
+                            {cert.skills.length > 2 && (
+                              <span className="font-mono text-[9px] text-foreground/35 px-1 py-0.5">+{cert.skills.length - 2}</span>
+                            )}
                           </div>
                         </motion.div>
                       )
                     })}
+                    {/* Trailing spacer so last card isn't hidden under fade */}
+                    <div className="flex-none w-4 md:w-8 shrink-0" />
                   </div>
 
-                  <div className="absolute left-0 top-0 bottom-4 w-24 bg-gradient-to-r from-background via-background/80 to-transparent pointer-events-none hidden md:flex items-center justify-start z-10 opacity-0 group-hover/carousel:opacity-100 transition-opacity duration-300">
-                    <button
-                      onClick={() => scrollCarousel('left')}
-                      className="pointer-events-auto p-2 ml-2 rounded-full bg-background/50 border border-black/20 dark:border-white/20 hover:bg-black/10 dark:bg-white/10 transition-all text-foreground/80 backdrop-blur-xl focus-visible:outline focus-visible:outline-2"
-                      aria-label="Scroll certificates left"
-                    >
-                      <ChevronLeft className="w-6 h-6" />
-                    </button>
-                  </div>
-                  <div className="absolute right-0 top-0 bottom-4 w-24 bg-gradient-to-l from-background via-background/80 to-transparent pointer-events-none hidden md:flex items-center justify-end z-10 opacity-0 group-hover/carousel:opacity-100 transition-opacity duration-300">
-                    <button
-                      onClick={() => scrollCarousel('right')}
-                      className="pointer-events-auto p-2 mr-2 rounded-full bg-background/50 border border-black/20 dark:border-white/20 hover:bg-black/10 dark:bg-white/10 transition-all text-foreground/80 backdrop-blur-xl focus-visible:outline focus-visible:outline-2"
-                      aria-label="Scroll certificates right"
-                    >
-                      <ChevronRight className="w-6 h-6" />
-                    </button>
-                  </div>
+                  {/* Scroll hint dots */}
+                  <p className="text-center text-[10px] text-foreground/30 font-mono mt-2 pb-1">
+                    ← drag to scroll →
+                  </p>
                 </motion.div>
               )}
             </motion.div>

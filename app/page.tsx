@@ -13,18 +13,30 @@ import { Footer } from '@/components/footer'
 import { SmoothScroll } from '@/components/smooth-scroll'
 import { AnimatedBackground } from '@/components/animated-background'
 import { AudioToggle } from '@/components/audio-toggle'
+import { SlowmoToggle } from '@/components/slowmo-toggle'
+import { WaterToggle } from '@/components/water-toggle'
 import en from '@/messages/en.json'
 import id from '@/messages/id.json'
 
 export default function Home() {
   const [locale, setLocale] = useState('en')
   const [mounted, setMounted] = useState(false)
+  const [isSlowMo, setIsSlowMo] = useState(false)
+  const [isWaterEnabled, setIsWaterEnabled] = useState(false)
 
   useEffect(() => {
     setMounted(true)
     const savedLocale = localStorage.getItem('locale') || 'en'
     setLocale(savedLocale)
   }, [])
+
+  const handleToggleSlowMo = () => {
+    setIsSlowMo(!isSlowMo)
+  }
+
+  const handleToggleWater = () => {
+    setIsWaterEnabled(!isWaterEnabled)
+  }
 
   if (!mounted) return null
 
@@ -33,8 +45,10 @@ export default function Home() {
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <SmoothScroll />
-      <AnimatedBackground />
+      <AnimatedBackground isSlowMo={isSlowMo} isWaterEnabled={isWaterEnabled} />
       <AudioToggle />
+      <SlowmoToggle isSlowMo={isSlowMo} onToggle={handleToggleSlowMo} />
+      <WaterToggle isWaterEnabled={isWaterEnabled} onToggle={handleToggleWater} />
       <main className="relative z-10 w-full overflow-hidden">
         <Navigation />
         <Hero />
@@ -48,4 +62,5 @@ export default function Home() {
     </NextIntlClientProvider>
   )
 }
+
 

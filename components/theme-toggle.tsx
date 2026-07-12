@@ -5,14 +5,13 @@ import { useEffect, useState } from 'react'
 import { Button } from './ui/button'
 
 export function ThemeToggle() {
-  const [isDark, setIsDark] = useState(true)
-  const [mounted, setMounted] = useState(false)
+  const [isDark, setIsDark] = useState(() => {
+    if (typeof window === 'undefined') return true
+    return document.documentElement.classList.contains('dark')
+  })
 
   useEffect(() => {
-    setMounted(true)
-    const isDarkMode = localStorage.getItem('theme') === 'dark' || 
-      (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)
-    setIsDark(isDarkMode)
+    setIsDark(document.documentElement.classList.contains('dark'))
   }, [])
 
   const toggleTheme = (e: React.MouseEvent) => {
@@ -33,36 +32,15 @@ export function ThemeToggle() {
       Math.max(y, innerHeight - y)
     )
 
-    const transition = document.startViewTransition(() => {
+    document.documentElement.style.setProperty('--x', `${x}px`)
+    document.documentElement.style.setProperty('--y', `${y}px`)
+    document.documentElement.style.setProperty('--r', `${endRadius}px`)
+
+    document.startViewTransition(() => {
       setIsDark(newIsDark)
       localStorage.setItem('theme', newIsDark ? 'dark' : 'light')
       document.documentElement.classList.toggle('dark', newIsDark)
     })
-
-    transition.ready.then(() => {
-      const clipPath = [
-        `circle(0px at ${x}px ${y}px)`,
-        `circle(${endRadius}px at ${x}px ${y}px)`
-      ]
-
-      document.documentElement.animate(
-        {
-          clipPath: clipPath,
-          filter: ['blur(6px)', 'blur(3px)', 'blur(0px)'],
-        },
-        {
-          duration: 1200,
-          easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
-          pseudoElement: '::view-transition-new(root)',
-          composite: 'replace',
-          fill: 'forwards',
-        }
-      )
-    })
-  }
-
-  if (!mounted) {
-    return <Button variant="ghost" size="icon" disabled className="h-9 w-9" />
   }
 
   return (
