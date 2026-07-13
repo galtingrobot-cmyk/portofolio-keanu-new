@@ -313,7 +313,7 @@ class PortfolioAudioEngine {
 
   getFrequencyData(): Uint8Array {
     if (this.analyser) {
-      this.analyser.getByteFrequencyData(this.frequencyData as unknown as Uint8Array)
+      this.analyser.getByteFrequencyData(this.frequencyData as any)
     }
     return this.frequencyData
   }
