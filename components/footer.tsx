@@ -8,7 +8,7 @@ export function Footer() {
   const t = useTranslations('footer')
 
   const socialLinks = [
-    { icon: Code2, href: 'https://github.com/keanudustin', label: 'GitHub' },
+    { icon: Code2, href: 'https://github.com/Gotrings', label: 'GitHub' },
     { icon: Briefcase, href: 'https://www.linkedin.com/in/keanu-dustin-kemala/', label: 'LinkedIn' },
     { icon: Camera, href: 'https://www.instagram.com/captathings/', label: 'Instagram' },
     { icon: Mail, href: 'mailto:keanudustin10@gmail.com', label: 'Email' },
@@ -85,11 +85,7 @@ export function Footer() {
           variants={itemVariants}
           className="border-t border-border/40 pt-8 flex flex-col md:flex-row items-center justify-between text-sm text-muted-foreground"
         >
-          <p>&copy; 2024 Keanu Dustin Kemala. {t('allRights')}</p>
-          <div className="flex gap-6 mt-4 md:mt-0">
-            <a href="#" className="hover:text-foreground transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-foreground transition-colors">Terms of Service</a>
-          </div>
+          <p>&copy; {new Date().getFullYear()} Keanu Dustin Kemala. {t('allRights')}</p>
         </motion.div>
       </motion.div>
     </footer>

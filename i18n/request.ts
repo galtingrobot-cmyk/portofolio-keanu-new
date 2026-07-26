@@ -3,12 +3,14 @@ import { notFound } from 'next/navigation'
 import { locales } from './config'
 
 export default getRequestConfig(async ({ locale }) => {
+  const validLocale = (locale || 'en') as any
   // Validate that the incoming `locale` parameter is valid
-  if (!locales.includes(locale as any)) notFound()
+  if (!locales.includes(validLocale)) notFound()
 
   return {
+    locale: validLocale,
     messages: (
-      await (locale === 'id'
+      await (validLocale === 'id'
         ? import('../messages/id.json')
         : import('../messages/en.json'))
     ).default,
