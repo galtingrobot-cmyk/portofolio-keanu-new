@@ -230,6 +230,14 @@
   animation: spin-slow 6s linear infinite;
 }
 
+/* Hide scrollbar for everything, we use custom aesthetic scrollbar */
+::-webkit-scrollbar {
+  display: none;
+}
+* {
+  scrollbar-width: none;
+}
+
 /* Hide scrollbar for carousel */
 .hide-scrollbar {
   -ms-overflow-style: none;
