@@ -564,9 +564,10 @@ export function Experience() {
                 <button
                   onClick={(e) => {
                     e.stopPropagation()
-                    setCurrentImageIndex((prev) => (prev === 0 ? lightboxImages.length - 1 : prev - 1))
+                    if (currentImageIndex === 0) setLightboxImages(null)
+                    else setCurrentImageIndex(currentImageIndex - 1)
                   }}
-                  className="absolute left-4 md:left-8 text-white/70 hover:text-white bg-black/10 dark:bg-white/10 hover:bg-black/20 dark:bg-white/20 rounded-full p-3 transition-all z-[110]"
+                  className="hidden md:block absolute left-8 text-white/70 hover:text-white bg-black/10 dark:bg-white/10 hover:bg-black/20 dark:bg-white/20 rounded-full p-3 transition-all z-[110]"
                   aria-label="Previous image"
                 >
                   <ChevronLeft className="w-6 h-6" />
@@ -574,13 +575,21 @@ export function Experience() {
                 <button
                   onClick={(e) => {
                     e.stopPropagation()
-                    setCurrentImageIndex((prev) => (prev === lightboxImages.length - 1 ? 0 : prev + 1))
+                    if (currentImageIndex === lightboxImages.length - 1) setLightboxImages(null)
+                    else setCurrentImageIndex(currentImageIndex + 1)
                   }}
-                  className="absolute right-4 md:right-8 text-white/70 hover:text-white bg-black/10 dark:bg-white/10 hover:bg-black/20 dark:bg-white/20 rounded-full p-3 transition-all z-[110]"
+                  className="hidden md:block absolute right-8 text-white/70 hover:text-white bg-black/10 dark:bg-white/10 hover:bg-black/20 dark:bg-white/20 rounded-full p-3 transition-all z-[110]"
                   aria-label="Next image"
                 >
                   <ChevronRight className="w-6 h-6" />
                 </button>
+                
+                {/* Fixed Counter */}
+                <div className="absolute bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-xl px-4 py-1.5 rounded-full text-white/90 font-mono text-sm border border-black/10 dark:border-white/10 flex items-center gap-2 shadow-2xl z-[110] pointer-events-none">
+                  <span>{String(currentImageIndex + 1).padStart(2, '0')}</span>
+                  <span className="text-white/40">/</span>
+                  <span className="text-white/60">{String(lightboxImages.length).padStart(2, '0')}</span>
+                </div>
               </>
             )}
 
@@ -589,8 +598,24 @@ export function Experience() {
               initial={{ scale: 0.95, opacity: 0, y: 10 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               transition={{ duration: 0.3, ease: 'easeOut' }}
-              className="relative w-full max-w-5xl h-full flex flex-col items-center justify-center"
+              className={`relative w-full max-w-5xl h-full flex flex-col items-center justify-center ${lightboxImages.length > 1 ? 'cursor-grab active:cursor-grabbing' : ''}`}
               onClick={(e) => e.stopPropagation()}
+              drag={lightboxImages.length > 1 ? "x" : false}
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.7}
+              onDragEnd={(e, { offset, velocity }) => {
+                if (lightboxImages.length <= 1) return
+                const swipePower = Math.abs(offset.x) * velocity.x
+                if (swipePower < -5000 || offset.x < -50) {
+                  // Swipe left (next image)
+                  if (currentImageIndex === lightboxImages.length - 1) setLightboxImages(null)
+                  else setCurrentImageIndex(currentImageIndex + 1)
+                } else if (swipePower > 5000 || offset.x > 50) {
+                  // Swipe right (prev image)
+                  if (currentImageIndex === 0) setLightboxImages(null)
+                  else setCurrentImageIndex(currentImageIndex - 1)
+                }
+              }}
             >
               <div className="relative w-full max-h-[85vh] flex-1 flex items-center justify-center">
                 <Image
@@ -600,16 +625,9 @@ export function Experience() {
                   className="object-contain"
                   sizes="100vw"
                   quality={100}
+                  draggable={false}
                 />
               </div>
-              
-              {lightboxImages.length > 1 && (
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-xl px-4 py-1.5 rounded-full text-white/90 font-mono text-sm border border-black/10 dark:border-white/10 flex items-center gap-2 shadow-2xl">
-                  <span>{String(currentImageIndex + 1).padStart(2, '0')}</span>
-                  <span className="text-white/40">/</span>
-                  <span className="text-white/60">{String(lightboxImages.length).padStart(2, '0')}</span>
-                </div>
-              )}
             </motion.div>
           </motion.div>
         )}

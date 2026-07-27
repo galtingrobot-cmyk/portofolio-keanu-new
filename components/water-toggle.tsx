@@ -20,8 +20,7 @@ export function WaterToggle({ isWaterEnabled, onToggle }: WaterToggleProps) {
   return (
     <button
       onClick={onToggle}
-      className="fixed bottom-6 z-50 group cursor-pointer"
-      style={{ right: '136px' }}
+      className="relative group cursor-pointer"
       aria-label={isWaterEnabled ? 'Disable water ripples' : 'Enable water ripples'}
       title={isWaterEnabled ? 'Disable Water Effect' : 'Enable Water Effect'}
     >

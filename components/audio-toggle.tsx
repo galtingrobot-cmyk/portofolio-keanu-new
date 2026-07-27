@@ -64,7 +64,7 @@ export function AudioToggle() {
   return (
     <button
       onClick={handleToggle}
-      className="fixed bottom-6 right-6 z-50 group cursor-pointer"
+      className="relative group cursor-pointer"
       aria-label={isPlaying ? 'Mute ambient audio' : 'Play ambient audio'}
       title={isPlaying ? 'Mute' : 'Play ambient sound'}
     >

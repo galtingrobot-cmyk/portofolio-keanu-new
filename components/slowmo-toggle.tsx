@@ -20,8 +20,7 @@ export function SlowmoToggle({ isSlowMo, onToggle }: SlowmoToggleProps) {
   return (
     <button
       onClick={onToggle}
-      className="fixed bottom-6 z-50 group cursor-pointer"
-      style={{ right: '80px' }}
+      className="relative group cursor-pointer"
       aria-label={isSlowMo ? 'Disable slow motion' : 'Enable slow motion'}
       title={isSlowMo ? 'Normal Speed' : 'Slow Motion'}
     >

@@ -43,7 +43,7 @@ export function Contact() {
   ]
 
   return (
-    <section id="contact" className="relative min-h-[100dvh] flex flex-col justify-center pt-24 pb-12 px-6 md:px-12 lg:px-20">
+    <section id="contact" className="relative min-h-[100dvh] flex flex-col justify-center pt-24 pb-12 px-4 sm:px-6 md:px-12 lg:px-20">
       <div className="max-w-5xl mx-auto w-full">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -63,8 +63,8 @@ export function Contact() {
           </p>
         </motion.div>
 
-        <div className="border border-black/10 dark:border-white/10 rounded-2xl bg-black/[0.02] dark:bg-white/[0.02] backdrop-blur-md p-6 md:p-8">
-          <div className="grid md:grid-cols-2 gap-8 items-stretch">
+        <div className="border border-black/10 dark:border-white/10 rounded-2xl bg-black/[0.02] dark:bg-white/[0.02] backdrop-blur-md p-4 sm:p-6 md:p-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-stretch">
             
             {/* Contact Information */}
             <motion.div
@@ -72,9 +72,9 @@ export function Contact() {
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
               viewport={{ once: true, margin: '-100px' }}
-              className="bg-black/5 dark:bg-white/5 backdrop-blur-md border border-black/10 dark:border-white/10 p-8 rounded-2xl h-full flex flex-col"
+              className="bg-black/5 dark:bg-white/5 backdrop-blur-md border border-black/10 dark:border-white/10 p-6 md:p-8 rounded-2xl h-full flex flex-col min-w-0"
             >
-              <h3 className="text-2xl font-heading font-bold mb-6">Contact Information</h3>
+              <h3 className="text-xl md:text-2xl font-heading font-bold mb-6">Contact Information</h3>
               <div className="space-y-4 flex-grow">
                 {contactInfo.map((info, idx) => {
                   const Icon = info.icon
@@ -84,14 +84,14 @@ export function Contact() {
                     <Wrapper
                       key={idx}
                       {...wrapperProps}
-                      className="flex items-start gap-4 p-4 rounded-xl hover:bg-black/5 dark:bg-white/5 border border-transparent hover:border-black/5 dark:hover:border-white/5 transition-all group cursor-pointer"
+                      className="flex items-start gap-3 md:gap-4 p-3 md:p-4 rounded-xl hover:bg-black/5 dark:bg-white/5 border border-transparent hover:border-black/5 dark:hover:border-white/5 transition-all group cursor-pointer min-w-0 w-full"
                     >
-                      <div className="p-3 bg-primary/10 rounded-xl text-primary group-hover:bg-primary group-hover:text-primary-foreground group-hover:scale-110 transition-all flex-shrink-0">
-                        <Icon className="w-5 h-5" />
+                      <div className="p-2.5 md:p-3 bg-primary/10 rounded-xl text-primary group-hover:bg-primary group-hover:text-primary-foreground group-hover:scale-110 transition-all flex-shrink-0">
+                        <Icon className="w-4 h-4 md:w-5 md:h-5" />
                       </div>
-                      <div className="min-w-0 flex flex-col justify-center pt-0.5">
-                        <p className="text-sm font-mono text-muted-foreground mb-0.5">{info.label}</p>
-                        <p className="font-medium text-foreground/90 break-words">{info.value}</p>
+                      <div className="min-w-0 flex flex-col justify-center pt-0.5 w-full">
+                        <p className="text-xs md:text-sm font-mono text-muted-foreground mb-0.5">{info.label}</p>
+                        <p className="text-sm md:text-base font-medium text-foreground/90 break-all">{info.value}</p>
                       </div>
                     </Wrapper>
                   )
@@ -105,10 +105,10 @@ export function Contact() {
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
               viewport={{ once: true, margin: '-100px' }}
-              className="bg-black/5 dark:bg-white/5 backdrop-blur-md border border-black/10 dark:border-white/10 p-8 rounded-2xl h-full flex flex-col"
+              className="bg-black/5 dark:bg-white/5 backdrop-blur-md border border-black/10 dark:border-white/10 p-6 md:p-8 rounded-2xl h-full flex flex-col min-w-0"
             >
-              <h3 className="text-2xl font-heading font-bold mb-6">Social Media</h3>
-              <div className="grid grid-cols-2 gap-4 flex-grow">
+              <h3 className="text-xl md:text-2xl font-heading font-bold mb-6">Social Media</h3>
+              <div className="grid grid-cols-2 gap-3 md:gap-4 flex-grow">
                 {socialLinks.map((social, idx) => {
                   const Icon = social.icon
                   return (
@@ -117,12 +117,12 @@ export function Contact() {
                       href={social.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`flex flex-col items-center justify-center gap-3 p-6 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-muted-foreground transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:bg-black/10 dark:hover:bg-white/10 ${social.color}`}
+                      className={`flex flex-col items-center justify-center gap-2 md:gap-3 p-4 md:p-6 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-muted-foreground transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:bg-black/10 dark:hover:bg-white/10 ${social.color} min-w-0`}
                     >
                       <div className="transform transition-transform duration-300 group-hover:scale-110">
                         <Icon />
                       </div>
-                      <span className="text-sm font-mono font-medium">{social.name}</span>
+                      <span className="text-xs md:text-sm font-mono font-medium truncate w-full text-center">{social.name}</span>
                     </a>
                   )
                 })}
