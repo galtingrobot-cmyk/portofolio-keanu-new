@@ -36,7 +36,8 @@ export function Contact() {
   ]
 
   const socialLinks = [
-    { icon: GithubIcon, name: 'GitHub', url: 'https://github.com/Gotrings', color: 'hover:border-gray-400 hover:text-gray-300' },
+    { icon: GithubIcon, name: 'GitHub 1st', url: 'https://github.com/Gotrings', color: 'hover:border-gray-400 hover:text-gray-300' },
+    { icon: GithubIcon, name: 'GitHub 2nd', url: 'https://github.com/galtingrobot-cmyk', color: 'hover:border-gray-400 hover:text-gray-300' },
     { icon: YoutubeIcon, name: 'YouTube', url: 'https://www.youtube.com/@CreativityBot', color: 'hover:border-red-400 hover:text-red-400' },
     { icon: LinkedinIcon, name: 'LinkedIn', url: 'https://www.linkedin.com/in/keanu-dustin-kemala/', color: 'hover:border-blue-400 hover:text-blue-400' },
     { icon: InstagramIcon, name: 'Instagram', url: 'https://www.instagram.com/captathings/', color: 'hover:border-pink-400 hover:text-pink-400' },

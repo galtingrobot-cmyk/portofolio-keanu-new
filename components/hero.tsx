@@ -83,23 +83,17 @@ export function Hero() {
           transition={{ duration: 0.8, delay: 0.8, ease: "easeOut" }}
           className="flex flex-col sm:flex-row items-center justify-center gap-6"
         >
-          <Button 
-            size="lg" 
-            className="group relative overflow-hidden rounded-xl bg-primary text-primary-foreground hover:scale-105 transition-transform duration-300 h-12 px-6 text-sm font-semibold shadow-lg shadow-primary/30"
+          <a 
+            href="/CV%20ATS%20KEANU%20DUSTIN%20KEMALA.pdf" 
+            download="CV_Keanu_Dustin_Kemala.pdf"
+            className="inline-flex items-center justify-center group relative overflow-hidden rounded-xl bg-primary text-primary-foreground hover:scale-105 transition-transform duration-300 h-12 px-6 text-sm font-semibold shadow-lg shadow-primary/30"
           >
             <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
             <span className="relative flex items-center gap-2">
-              {t('viewWork')}
+              {t('downloadCV')}
               <Sparkles className="w-4 h-4" />
             </span>
-          </Button>
-          <Button
-            variant="outline"
-            size="lg"
-            className="rounded-xl border-border/50 bg-background/30 backdrop-blur-md hover:bg-black/10 dark:bg-white/10 hover:border-black/20 dark:border-white/20 hover:text-foreground transition-all duration-300 h-12 px-6 text-sm font-medium"
-          >
-            {t('learnMore')}
-          </Button>
+          </a>
         </motion.div>
 
         {/* Scroll Indicator */}
