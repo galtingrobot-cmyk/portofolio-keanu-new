@@ -66,8 +66,8 @@ export function About() {
                 <div className="w-full h-full rounded-full bg-background p-[3px]">
                   <div className="w-full h-full rounded-full overflow-hidden relative">
                     <Image
-                      src="/images/profile/keanu.png"
-                      alt="Keanu Dustin Kemala"
+                      src="/images/profile/keanu-dustin-kemala-frontend-developer.png"
+                      alt="Foto wajah Keanu Dustin Kemala, Frontend Developer"
                       fill
                       className="object-cover"
                       sizes="(max-width: 768px) 256px, (max-width: 1024px) 320px, 384px"

@@ -66,7 +66,7 @@ export function Projects() {
       category: 'web',
       tech: ['React', 'TypeScript', 'Next.js', 'Tailwind CSS', 'Shadcn UI'],
       image: '/images/projects/himtech.png',
-      link: 'https://himtech-2026.vercel.app/',
+      link: 'https://himtech-meta.vercel.app/',
     },
     {
       id: 3,

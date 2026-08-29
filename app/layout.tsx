@@ -95,6 +95,23 @@ export default function RootLayout({
             `,
           }}
         />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org/",
+              "@type": "Person",
+              "name": "Keanu Dustin Kemala",
+              "url": "https://keanu-dustin-kemala.vercel.app",
+              "image": "https://keanu-dustin-kemala.vercel.app/images/profile/keanu-dustin-kemala-frontend-developer.png",
+              "jobTitle": "Frontend Developer",
+              "sameAs": [
+                "https://www.linkedin.com/in/keanu-dustin-kemala/",
+                "https://github.com/Gotrings"
+              ]
+            })
+          }}
+        />
       </head>
       <body className="font-sans antialiased">
         <Providers>
